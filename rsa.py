@@ -8,8 +8,8 @@ Created on Fri May 15 14:05:26 2020
 import os
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
-import binascii
-    
+
+
 def generateKeysInHouse():
     key=RSA.generate(1024)
     return key
@@ -49,15 +49,6 @@ def exampleKey():
 
 def main():
     keys=generateKeysOSSL()
-    
-    #pubKey=keys.publickey()
-    #pubKeyPEM=pubKey.exportKey()
-    #print(pubKeyPEM.decode("ascii"))
-    
-    #print(f"Private key: (n-{hex(pubKey.n)}, d={hex(keys.d)})")
-    #privKeyPEM=keys.exportKey()
-    #print(privKeyPEM.decode("ascii"))
-    #plainText=b"Hello world!"
     plainText="Hello world!"
     padPlain=padText(plainText)
     print(padPlain)
