@@ -10,7 +10,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 
 
-def generateKeysInHouse():
+def generateKeysInHouse(): # Uses the RSA library to create a private key. Note public key is included as a subset of this. 
     key=RSA.generate(1024)
     return key
 
@@ -20,7 +20,8 @@ def generateKeysOSSL():
     key=RSA.importKey(f.read())
     return key
 
-def padText(plainText):
+def padText(plainText):                                     # Only converts plaintext into ASCII notation. 
+                                                            # Need to add PKCS1_OAEP padding.
     paddedPlainText=[ord(c) for c in plainText]
     return paddedPlainText
 
@@ -28,16 +29,18 @@ def unpadText(paddedText):
     plainText=[chr(c) for c in paddedText]
     return plainText
 
-def rsaEncrypt(keys,padPlain):
+def rsaEncrypt(keys,padPlain):                              # Encrypts using the RSA algorithm - runs in O(log(n))
+                                                            # due to built-in modular exponentation function.
+
     padEncrypt=[pow(m,keys.e,keys.n) for m in padPlain]
     return padEncrypt
 
-def rsaDecrypt(keys,padEncrypt):
+def rsaDecrypt(keys,padEncrypt):                           
     padDecrypt=[pow(c,keys.d,keys.n) for c in padEncrypt]
 
     return padDecrypt
 
-def exampleKey():
+def exampleKey():                                           # Provides small test case
     e=5
     p=13
     q=17
@@ -48,7 +51,7 @@ def exampleKey():
     return key
 
 def main():
-    keys=generateKeysOSSL()
+    keys=generateKeysInHouse()
     plainText="Hello world!"
     padPlain=padText(plainText)
     print(padPlain)
@@ -56,13 +59,5 @@ def main():
     padDecrypt=rsaDecrypt(keys,padEncrypt)
     plainText=unpadText(padDecrypt)
     print(plainText)
-    
-    #encryptor= PKCS1_OAEP.new(pubKey)
-    #encrypted=encryptor.encrypt(plainText)
-    #print("\n Encrypted:", binascii.hexlify(encrypted))
-    
-    #decryptor= PKCS1_OAEP.new(keys)
-    #decrypted= decryptor.decrypt(encrypted)
-    #print("\n Decrypted:", decrypted)
 
 main()
