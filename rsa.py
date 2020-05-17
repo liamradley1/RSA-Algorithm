@@ -7,25 +7,25 @@ Created on Fri May 15 14:05:26 2020
 import string
 import time
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP as P
+from Crypto.Cipher import PKCS1_OAEP
 import os
 
 
 def generateKeys():                                         # Uses the RSA library to create private keys.
     key=RSA.generate(1024)                                  # Note public key is included as a subset of this key. 
-    return key                                              # Unit test omitted as this only invokes a library subroutine.
-                                                            # Any cipher could be used - using PKCS1OAEP here.
+    return key
+                                                        
 
 
 def getPublicKey(key):
     return key.publickey()
 
-def padText(plainText, publicKey):                  # Only converts plaintext into ASCII notation. 
-    paddedPlainText=[ord(c) for c in plainText]             # Can use any padding cipher.
+def asciiText(plainText, publicKey):                        # Converts plaintext into ASCII notation, ready for a cipher to be applied. 
+    paddedPlainText = [ord(c) for c in plainText]           # Can use any padding cipher.
     return paddedPlainText
     
 
-def unpadText(paddedText, publicKey):                       # Will unit test as a pair in order to ensure correct padding.
+def characterText(paddedText, publicKey):
     plainText=[chr(c) for c in paddedText]
     return plainText
 
@@ -39,25 +39,16 @@ def rsaDecrypt(keys, padEncrypt):
 
     return padDecrypt
 
-def exampleKey():                                           # Provides small test case
-    e=5
-    p=13
-    q=17
-    n=13 * 17
-    d=77
-    components=(n, e, d, p, q)
-    key=RSA.construct(components)
-    return key
-
-def encryptAndSend(plainText, file, key):                   
+def RSAencryptAndSend(plainText, file, key):  
+    plainText="b" + plainText                 
     publicKey=getPublicKey(key)                             
-    padPlain=padText(plainText, publicKey)                   
+    padPlain=asciiText(plainText, publicKey)                   
     padEncrypt=rsaEncrypt(key, padPlain)                    
     padEncrypt=str(padEncrypt)
     f=open(file, "w")
     f.write(padEncrypt)
 
-def readAndDecrypt(file, key):
+def RSAreadAndDecrypt(file, key):
     publicKey=getPublicKey(key)
     f=open(file, "r")
     padEncrypt = list(f.read())
@@ -72,32 +63,51 @@ def readAndDecrypt(file, key):
                 elt2 = ""
     padEncrypt = padEncrypt2
     padDecrypt = rsaDecrypt(key, padEncrypt)
-    stringText = unpadText(padDecrypt, publicKey)
+    stringText = characterText(padDecrypt, publicKey)
     plainText = ""
-    for elt in stringText:
-        plainText = plainText + elt
+    for i in range(1, len(stringText)):
+        plainText = plainText + stringText[i]
     return plainText
+
+def createMessage(plainText, file, keys):
+    RSAencryptAndSend(plainText, file, keys)
+
 
 def rsaTest():
     keys=generateKeys()
-    file="message.txt"
-    plainText=string.ascii_letters+"0123456789"
-    createMessage(plainText, keys)
-    encryptAndSend(plainText, file, keys)
-    message = readAndDecrypt(file, keys)
-    assert(message == plainText)
-
-
-def createMessage(plainText, keys):
     file = "message.txt"
-    encryptAndSend(plainText, file, keys)
+    plainText = string.ascii_letters+"0123456789"
+    createMessage(plainText, file, keys)
+    message = RSAreadAndDecrypt(file, keys)
+    assert(message == plainText)
+    
+def sendPaddedMessage(message, keys, paddingCipher, file):
+    byteMessage=message.encode("utf-8")
+    encryptedMessage=paddingCipher.encrypt(byteMessage)
+    f=open(file,"wb")
+    f.write(encryptedMessage)
+
+def readPaddedMessage(keys, paddingCipher, file):
+    f=open(file,"rb")
+    paddedMessage = f.read()
+    decryptedMessage = paddingCipher.decrypt(paddedMessage)
+    return decryptedMessage
+
+def paddingTest(paddingCipher):
+    keys = generateKeys()
+    message = string.ascii_letters+"0123456789"
+    file = "message.txt"
+    sendPaddedMessage(message, keys, paddingCipher, file)
+    decrypted = readPaddedMessage(keys, paddingCipher, file)
+    message = bytes(message, "utf-8")
+    assert (message == decrypted)
+
+
 
 def main():
-    #rsaTest()
-    keys=generateKeys()
-    message= "Hello, World!"
-    file="message.txt"
-    createMessage(message, keys)
-    print(readAndDecrypt(file, keys))
-
+    keys = generateKeys()
+    padding = PKCS1_OAEP.new(keys)
+    rsaTest()
+    paddingTest(padding)
+    
 main()
