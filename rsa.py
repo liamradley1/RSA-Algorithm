@@ -182,7 +182,9 @@ def trackTimes(repetitions):
 
 
 def main():
-    repetitions = 10
+    time_0=time.time()
+    repetitions = 1000
     trackTimes(repetitions)    
-
+    elapsed= float(time.time()-time_0)
+    print(f"This experiment took {elapsed} seconds.")
 main()
