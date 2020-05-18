@@ -1,9 +1,4 @@
 #number_theory.py
-"""
-Provides the necessary numerical machinery to make a private key.
-
-@author: Liam Radley
-"""
 
 def gcd(p, q):
     while q != 0:
@@ -11,6 +6,7 @@ def gcd(p, q):
         q = p % q
         p = t
     return int(p)
+
 
 def lcm(p, q):
     lcm1 =(p * gcd(p, q)) * q
