@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 15 14:05:26 2020
+Provides the subroutines necessary to encrypt and decrypt using the RSA algorithm,
+as well as that of additional PKCS1_OAEP. Note that the two invoke separate methods.
 
-@author: Liam
+@author: Liam Radley
 """
+
 import string
 import time
-import key_gen
-import os
 import key_gen
 from Crypto.Cipher import PKCS1_OAEP
 
@@ -29,7 +29,7 @@ def RSADecrypt(keys, padEncrypt):                           # Only those with a 
     return padDecrypt
 
 def RSAencryptAndSend(plainText, file, key):                # Implementation of RSA into 2 key chunks - aids user friendliness.                        
-    padPlain=asciiText(plainText)         
+    padPlain=asciiText(plainText)
     padEncrypt=RSAEncrypt(key, padPlain)                    
     padEncrypt=str(padEncrypt)
     f=open(file, "w")
@@ -92,7 +92,7 @@ def trackTimes(repetitions):
     for i in range(0, repetitions):
 
         time_0 = time.time()                                # Run for the self-implemented subroutine
-        keys = key_gen.generateKeys2()
+        keys = key_gen.generateKeys2(2048)
         elapsed = float(time.time() - time_0)
         myTimeAvg += elapsed
         myTimes.append(elapsed)
@@ -100,7 +100,7 @@ def trackTimes(repetitions):
         paddingTest(padding, keys)                          # Want to ensure that the correct answer is received in each case.
 
         time_0 = time.time()                                # Run for the standard subroutines.
-        keys = key_gen.generateKeys()
+        keys = key_gen.generateKeys(2048)
         elapsed = float(time.time()-time_0)
         standardTimeAvg += elapsed
         standardTimes.append(elapsed)
@@ -123,7 +123,14 @@ def trackTimes(repetitions):
     print(f"This experiment took {endTime} seconds.")
 
 def main():
-    repetitions = 1000                                      # Choose suitably large iterations to obtain a good running time estimate.
-    trackTimes(repetitions)    
+    testing = True                                          # Set to true to test running times.
+    keys= key_gen.generateKeys2(2048)
+    cipher = PKCS1_OAEP.new(keys)
+    rsaTest(keys)
+    paddingTest(cipher, keys)
+    if(testing == True):
+        repetitions = 1000                                  # Choose suitably large iterations to obtain a good running time estimate.
+        trackTimes(repetitions)
+
 
 main()
