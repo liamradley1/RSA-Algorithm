@@ -16,8 +16,7 @@ def generateKeys(n_length):                                             # Uses t
 
 def generateKeys2(n_length):                                            # Returns a 2048 bit private key with same prime                                                              
     if(n_length < 2048 ):
-        print("Key length must be at least 2048 to ensure security.")   
-        exit(1)
+        raise ValueError("Key length must be at least 2048 to ensure security.")
     e = 65537
     p = number.getStrongPrime(int(n_length / 2))                        # strong prime false-positive probability as that of the RSA subroutine.
     q = number.getStrongPrime(int(n_length / 2))

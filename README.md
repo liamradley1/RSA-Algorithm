@@ -5,4 +5,8 @@
 
 - Generates keys using subroutine in Python's RSA library, or via a separate method in key_gen.py. 
 
-- Investigation into difference in running times seems to suggest the two are similar in speed, if not that the new method is slightly faster. Both use strongPrime with a tolerance of 1e-6. See supporting "times.txt" for details.
+- Investigation into difference in running times seems to suggest the two subroutines for key generation are similar in speed. Both generate strong primes with a false positive tolerance of 1e-6. Use testTimes.py to 
+experiment further.
+
+- Unit tests are now implemented. 
+
