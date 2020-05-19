@@ -54,13 +54,6 @@ def RSAreadAndDecrypt(file, key):
     for i in range(0, len(stringText)):
         plainText = plainText + stringText[i]
     return plainText
-
-def rsaTest(keys):                                          # Tests the correctness of the implemented RSA algorithm.
-    file = "message.txt"
-    plainText = string.ascii_letters + "0123456789"
-    RSAencryptAndSend(plainText, file, keys)
-    message = RSAreadAndDecrypt(file, keys)
-    assert(message == plainText)
     
 def sendPaddedMessage(message, keys, paddingCipher, file):  # Separate subroutine for if one aims to work with padding.
     byteMessage=message.encode("utf-8")                     # Change to byte form to work with padding.
@@ -73,64 +66,3 @@ def readPaddedMessage(keys, paddingCipher, file):
     paddedMessage = f.read()
     decryptedMessage = paddingCipher.decrypt(paddedMessage)
     return decryptedMessage
-
-def paddingTest(paddingCipher, keys):                       # Tests to see if the message is actually transmitted and read correctly.
-    message = string.ascii_letters+"0123456789"
-    file = "message.txt"
-    sendPaddedMessage(message, keys, paddingCipher, file)
-    decrypted = readPaddedMessage(keys, paddingCipher, file)
-    message = bytes(message, "utf-8")
-    assert (message == decrypted)
-
-def trackTimes(repetitions):
-    startTime=time.time()
-    myTimeAvg = 0
-    standardTimeAvg = 0
-    myTimes = []
-    standardTimes = []
-
-    for i in range(0, repetitions):
-
-        time_0 = time.time()                                # Run for the self-implemented subroutine
-        keys = key_gen.generateKeys2(2048)
-        elapsed = float(time.time() - time_0)
-        myTimeAvg += elapsed
-        myTimes.append(elapsed)
-        padding = PKCS1_OAEP.new(keys)
-        paddingTest(padding, keys)                          # Want to ensure that the correct answer is received in each case.
-
-        time_0 = time.time()                                # Run for the standard subroutines.
-        keys = key_gen.generateKeys(2048)
-        elapsed = float(time.time()-time_0)
-        standardTimeAvg += elapsed
-        standardTimes.append(elapsed)
-        padding = PKCS1_OAEP.new(keys)
-        paddingTest(padding, keys)                          # Again, test for correctness.
-        
-    f=open("times.txt", "w")                                # Write times to file for future reference.
-    f.write("My Times, Standard Times \n")                  # Be careful when rerunning experiment - data may be overwritten.
-    for i in range(0, repetitions):
-        f.write(str(myTimes[i]))
-        f.write(",")
-        f.write(str(standardTimes[i]))
-        f.write("\n")
-    f.close()
-    myTimeAvg /= repetitions
-    standardTimeAvg /= repetitions
-    print(f"Average time per iteration on my code: {myTimeAvg} seconds.")
-    print(f"Average time per iteration on standard code: {standardTimeAvg} seconds.")
-    endTime = time.time() - startTime
-    print(f"This experiment took {endTime} seconds.")
-
-def main():
-    testing = True                                          # Set to true to test running times.
-    keys= key_gen.generateKeys2(2048)
-    cipher = PKCS1_OAEP.new(keys)
-    rsaTest(keys)
-    paddingTest(cipher, keys)
-    if(testing == True):
-        repetitions = 1000                                  # Choose suitably large iterations to obtain a good running time estimate.
-        trackTimes(repetitions)
-
-
-main()
