@@ -1,7 +1,9 @@
 # RSA Algorithm
-- Basic implementation of the RSA Algorithm in Python.
+- Basic implementation of the RSA Algorithm in Python. Uses ASCII representation of characters to utilise the cipher.
 
-- Also gives a separate implementation using PKCS01_OAEP padding, as basic RSA still allows attributes like the number of occurrences of a   particular character used to be visible.
+- Also gives a separate implementation using PKCS01_OAEP padding, requiring messages to be changed into byte form.
+  Cryptograhically necessary as basic RSA still allows attributes like the number of occurrences of a
+  particular character used to be visible.
 
 - Generates keys using subroutine in Python's RSA library, or via a separate method in key_gen.py. 
 
